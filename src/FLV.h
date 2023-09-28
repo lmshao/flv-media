@@ -14,7 +14,7 @@ struct FLVHeader {
     uint8_t : 1;                         // Must be 0
     uint8_t flagAudio : 1;               // Audio tags are present
     uint8_t : 5;                         // Must be 0
-    uint32_t offset = 9;                 // value 9 for FLV version 1.
+    uint8_t offset[4] = {0, 0, 0, 9};    // value 9 for FLV version 1.
 
     FLVHeader() { *(&version + 1) = 0x00; }
     FLVHeader(bool hasVideo, bool hasAudio) {

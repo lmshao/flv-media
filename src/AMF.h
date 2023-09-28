@@ -5,7 +5,6 @@
 #ifndef FLV_MEDIA_AMF_H
 #define FLV_MEDIA_AMF_H
 
-#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
@@ -69,6 +68,8 @@ public:
     void Set(const std::string &s, const AMFValue &val);
     // AMF_STRICT_ARRAY
     void Add(const AMFValue &val);
+
+    std::string Dump();
 
 private:
     void Destroy();

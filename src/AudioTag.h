@@ -47,18 +47,19 @@ enum AACPacketType : uint8_t {
 };
 
 struct AudioTagHeader {
-    AudioCodec codec;
-    AudioSamplingRate rate;
-    AudioSamplingBitDepth bits;
-    AudioChannel channels;
+    AudioChannel channels : 1;
+    AudioSamplingBitDepth bits : 1;
+    AudioSamplingRate rate : 2;
+    AudioCodec codec : 4;
     uint8_t data[0];
 };
 
 struct AACAudioTagHeader {
-    AudioCodec codec;
-    AudioSamplingRate rate;
-    AudioSamplingBitDepth bits;
-    AudioChannel channels;
+    AudioChannel channels : 1;
+    AudioSamplingBitDepth bits : 1;
+    AudioSamplingRate rate : 2;
+    AudioCodec codec : 4;
+
     AACPacketType packetType;
     uint8_t data[0];
 };

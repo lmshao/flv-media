@@ -4,7 +4,9 @@
 
 #include "AMF.h"
 #include <cassert>
+#include <iomanip>
 #include <netinet/in.h>
+#include <sstream>
 #include <stdexcept>
 
 AMFValue::AMFValue(AMFType type) : type_(type) {}
@@ -34,7 +36,9 @@ AMFValue::AMFValue(bool b) {
     value_ = new bool(b);
 }
 
-AMFValue::AMFValue(const AMFValue &from) : type_(AMF_NULL) { *this = from; }
+AMFValue::AMFValue(const AMFValue &from) : type_(AMF_NULL) {
+    *this = from;
+}
 
 AMFValue &AMFValue::operator=(const AMFValue &from) {
     if (this == &from) {
@@ -66,7 +70,9 @@ AMFValue &AMFValue::operator=(const AMFValue &from) {
     return *this;
 }
 
-AMFValue::~AMFValue() { Destroy(); }
+AMFValue::~AMFValue() {
+    Destroy();
+}
 
 void AMFValue::Destroy() {
     switch (type_) {
@@ -92,9 +98,13 @@ void AMFValue::Destroy() {
     value_ = nullptr;
 }
 
-AMFType AMFValue::Type() const { return type_; }
+AMFType AMFValue::Type() const {
+    return type_;
+}
 
-void *AMFValue::GetValue() const { return value_; }
+void *AMFValue::GetValue() const {
+    return value_;
+}
 
 void AMFValue::Set(const std::string &s, const AMFValue &val) {
     if (type_ != AMF_OBJECT && type_ != AMF_ECMA_ARRAY) {
@@ -177,6 +187,33 @@ const AMFValue::ArrayType &AMFValue::AsArray() const {
     return *(ArrayType *)value_;
 }
 
+std::string AMFValue::Dump() {
+    std::stringstream ss;
+    switch (type_) {
+        case AMF_NUMBER:
+            ss << (size_t)(*(double *)value_);
+            break;
+        case AMF_BOOLEAN:
+            ss << *(bool *)value_;
+            break;
+        case AMF_STRING:
+        case AMF_LONG_STRING:
+            ss << *(std::string *)value_;
+            break;
+        case AMF_OBJECT:
+        case AMF_ECMA_ARRAY: {
+            auto object = (ObjectType *)value_;
+            for (auto &o : *object) {
+                ss << "\t" << std::left << std::setw(20) << o.first << ": " << o.second.Dump() << "\n";
+            }
+        } break;
+        case AMF_STRICT_ARRAY:
+        default:
+            break;
+    }
+    return ss.str();
+}
+
 /// AMFEncoder
 AMFEncoder &AMFEncoder::operator<<(const char *s) {
     if (s) {
@@ -204,7 +241,9 @@ AMFEncoder &AMFEncoder::operator<<(std::nullptr_t) {
     return *this;
 }
 
-AMFEncoder &AMFEncoder::operator<<(const int n) { return (*this) << (double)n; }
+AMFEncoder &AMFEncoder::operator<<(const int n) {
+    return (*this) << (double)n;
+}
 
 AMFEncoder &AMFEncoder::operator<<(const double n) {
     buffer_ += char(AMF_NUMBER);
@@ -277,9 +316,13 @@ AMFEncoder &AMFEncoder::operator<<(const AMFValue &value) {
     return *this;
 }
 
-const std::string &AMFEncoder::Data() const { return buffer_; }
+const std::string &AMFEncoder::Data() const {
+    return buffer_;
+}
 
-void AMFEncoder::Clear() { buffer_.clear(); }
+void AMFEncoder::Clear() {
+    buffer_.clear();
+}
 
 void AMFEncoder::WriteKay(const std::string &key) {
     assert(key.size() <= 0xffff);

@@ -26,7 +26,7 @@ enum VideoCodec : uint8_t {
 };
 
 enum AVCPacketType : uint8_t {
-    AVC_HEADER = 0, // AVC sequence header
+    AVC_HEADER = 0, // AVC sequence header, SPS+PPS
     AVC_NALU,       // AVC NALU
     AVC_END         // AVC end of sequence (lower level NALU sequence ender is not required or supported)
 };
@@ -37,13 +37,29 @@ struct VideoTagHeader {
 };
 
 struct AVCVideoTagHeader {
-    VideoCodec codec : 4;
-    VideoFrameType frameType : 4; // 7 for AVC
+    VideoCodec codec : 4; // 7 for AVC
+    VideoFrameType frameType : 4;
     AVCPacketType packetType;
     /// if AVCPacketType == 1, Composition time offset, else 0
     uint8_t cst[3];
     /// video composition time(PTS - DTS), AVC/HEVC/AV1 only
     uint8_t data[0];
+};
+
+struct AVCDecoderConfigurationRecord {
+    uint8_t version = 1;
+    uint8_t profileIndication;      // SPS[1]
+    uint8_t profileCompatibility;   // SPS[2]
+    uint8_t levelIndication;        // SPS[3]
+    uint8_t lengthSizeMinusOne : 2; // 0b11;
+    uint8_t : 6;                    // reserved, 0b111111
+    uint8_t numOfSPS : 5;
+    uint8_t : 3; // reserved, 0b111
+    // uint16_t SPS length
+    // SPS
+    // uint8_t numOfPPS
+    // PPS length
+    // PPS
 };
 
 #endif // FLV_MEDIA_VIDEO_TAG_H
